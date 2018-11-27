@@ -13,8 +13,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    // Keep a reference to the NetworkFragment, which owns the AsyncTask object
+    // that is used to execute network ops.
+    private NetworkFragment mNetworkFragment;
+    // Boolean telling us whether a download is in progress, so we don't trigger overlapping
+    // downloads with consecutive button clicks.
+    private boolean mDownloading = false;
 
-    // test comment
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +30,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        mNetworkFragment = NetworkFragment.getInstance(getSupportFragmentManager(), "https://www.google.com");
     }
 
 
