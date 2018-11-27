@@ -9,3 +9,6 @@
 /build
 /captures
 .externalNativeBuild
+bin/
+gen/
+out/

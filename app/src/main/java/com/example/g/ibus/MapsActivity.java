@@ -1,7 +1,10 @@
 package com.example.g.ibus;
 
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -10,9 +13,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+
 
     private GoogleMap mMap;
+    private Menu menu;
 
     // test comment
 
@@ -26,6 +31,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.tram:
+                return true;
+            case R.id.trolley:
+                return true;
+            case R.id.bus:
+                return true;
+            case R.id.for_blind:
+                item.setChecked(!item.isChecked());
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     /**
      * Manipulates the map once available.
