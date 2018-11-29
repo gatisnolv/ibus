@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">My Application</string>
     <string name="gtfs">gtfs.zip</string>
+    <string name="stops">stops.txt</string>
+    <string name="shapes">shapes.txt</string>
+    <string name="routes">routes.txt</string>
+    <string name="calendar">calendar.txt</string>
+    <string name="stop_times">stop_times.txt</string>
+    <string name="trips">trips.txt</string>
+
 
 </resources>
