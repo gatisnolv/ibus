@@ -19,6 +19,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -27,15 +28,15 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import android.util.Log;
 
 public class MapsActivity extends AppCompatActivity implements
+        GoogleMap.OnMarkerClickListener,
         OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener
 {
-
-
     private GoogleMap mMap;
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
@@ -43,6 +44,9 @@ public class MapsActivity extends AppCompatActivity implements
     private Marker currentUserLocationMarker;
     private static final int Request_User_Location_Code = 99;
     private double latitide, longitude;
+
+    private static final String LOG = "MapLog";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,17 +60,46 @@ public class MapsActivity extends AppCompatActivity implements
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)            {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             buildGoogleApiClient();
-            mMap.setMyLocationEnabled(true);
+//            mMap.setMyLocationEnabled(true);
         }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(56.946285, 24.105078), 15)); //56.946285, 24.105078
+
+        Log.i(LOG, "onMapReady()");
+
+        Marker testBus = mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(56.946445, 24.105628))
+                .draggable(true)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.bus))
+                /* .title("testBus") */ );
+
+//        mMap.addMarker(new MarkerOptions()
+//                .position(new LatLng(56.946445, 24.105628))
+//                .title("Hello world"));
+
+        // Add some markers to the map, and add a data object to each marker.
+//        testBus = mMap.addMarker(new MarkerOptions()
+//                .position(new LatLng(56.946445, 24.105628))
+//                .title("testBus"));
+//        testBus.setTag(0);
+
+        // Set a listener for marker click.
+        mMap.setOnMarkerClickListener(this);
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        int ticks = 0;
+            marker.setPosition(new LatLng(marker.getPosition().latitude + 0.0005, marker.getPosition().longitude + 0.0005));
+        return false;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
@@ -161,8 +194,8 @@ public class MapsActivity extends AppCompatActivity implements
         markerOptions.title("User Current Location");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
         currentUserLocationMarker = mMap.addMarker(markerOptions);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomBy(10));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+//        mMap.animateCamera(CameraUpdateFactory.zoomBy(10));
         if(googleApiClient != null)
         {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient,this);
@@ -183,7 +216,11 @@ public class MapsActivity extends AppCompatActivity implements
     @Override
     public void onConnectionSuspended(int i) {
     }
+
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
     }
+
+
+
 }
