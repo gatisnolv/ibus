@@ -2,9 +2,15 @@ package com.example.g.ibus;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Interpolator;
+import android.graphics.Point;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -12,6 +18,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -23,6 +30,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -47,6 +55,10 @@ public class MapsActivity extends AppCompatActivity implements
 
     private static final String LOG = "MapLog";
 
+    // destination objects for testing purposes
+    LatLng posStart = new LatLng(56.946285, 24.105078);
+    LatLng posFinish = new LatLng(56.947685, 24.103778);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +75,19 @@ public class MapsActivity extends AppCompatActivity implements
 
     }
 
+    /** Method for resizing marker
+     *
+     * @param iconName -name of the .png file for marker, must be in drawable folder
+     * @param width
+     * @param height
+     * @return -returns Bitmap object for marker creation
+     */
+    public Bitmap resizeMapIcons(String iconName, int width, int height){
+        Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(),getResources().getIdentifier(iconName, "drawable", getPackageName()));
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
+        return resizedBitmap;
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -74,21 +99,13 @@ public class MapsActivity extends AppCompatActivity implements
 
         Log.i(LOG, "onMapReady()");
 
-        Marker testBus = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(56.946445, 24.105628))
+
+        final Marker testBus = mMap.addMarker(new MarkerOptions()
+                .position(posStart)
                 .draggable(true)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.bus))
+                .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("bus",40,40)))
+//                .icon(BitmapDescriptorFactory.fromResource(R.drawable.bus)) --old/simple way of creating icon
                 /* .title("testBus") */ );
-
-//        mMap.addMarker(new MarkerOptions()
-//                .position(new LatLng(56.946445, 24.105628))
-//                .title("Hello world"));
-
-        // Add some markers to the map, and add a data object to each marker.
-//        testBus = mMap.addMarker(new MarkerOptions()
-//                .position(new LatLng(56.946445, 24.105628))
-//                .title("testBus"));
-//        testBus.setTag(0);
 
         // Set a listener for marker click.
         mMap.setOnMarkerClickListener(this);
@@ -96,9 +113,9 @@ public class MapsActivity extends AppCompatActivity implements
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        int ticks = 0;
-            marker.setPosition(new LatLng(marker.getPosition().latitude + 0.0005, marker.getPosition().longitude + 0.0005));
-        return false;
+//            marker.setPosition(...);
+            animateMarker(marker, posFinish,false);
+        return true;
     }
 
     @Override
@@ -221,6 +238,43 @@ public class MapsActivity extends AppCompatActivity implements
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
     }
 
+
+    public void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker) {
+        final Handler handler = new Handler();
+        final long start = SystemClock.uptimeMillis();
+        Log.i(LOG, String.valueOf(start));
+        Projection proj = mMap.getProjection();
+        Point startPoint = proj.toScreenLocation(marker.getPosition());
+        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
+        final long duration = 5000;
+
+        final LinearInterpolator interpolator = new LinearInterpolator();
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                long elapsed = SystemClock.uptimeMillis() - start;
+                float t = interpolator.getInterpolation((float) elapsed
+                        / duration);
+                double lng = t * toPosition.longitude + (1 - t)
+                        * startLatLng.longitude;
+                double lat = t * toPosition.latitude + (1 - t)
+                        * startLatLng.latitude;
+                marker.setPosition(new LatLng(lat, lng));
+
+                if (t < 1.0) {
+                    // Post again 16ms later.
+                    handler.postDelayed(this, 16);
+                } else {
+                    if (hideMarker) {
+                        marker.setVisible(false);
+                    } else {
+                        marker.setVisible(true);
+                    }
+                }
+            }
+        });
+    }
 
 
 }
