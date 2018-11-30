@@ -13,8 +13,7 @@
 
         <item
             android:id="@+id/tram"
-            android:title="@string/tram"
-            android:icon="@drawable/ic_tram"/>
+            android:title="@string/tram" /> <!-- android:icon="@drawable/ic_tram" -->
 
         <item
             android:id="@+id/trolley"
