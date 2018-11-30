@@ -1,6 +1,8 @@
 package com.example.g.ibus;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +17,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -52,6 +55,7 @@ public class MapsActivity extends AppCompatActivity implements
     private Marker currentUserLocationMarker;
     private static final int Request_User_Location_Code = 99;
     private double latitide, longitude;
+Context context;
 
     private static final String LOG = "MapLog";
 
@@ -72,7 +76,7 @@ public class MapsActivity extends AppCompatActivity implements
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
+context = this;
     }
 
     /** Method for resizing marker
@@ -125,15 +129,34 @@ public class MapsActivity extends AppCompatActivity implements
         return true;
     }
 
+    private void showTransportList(String title, String[] items) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
+        builder.setTitle(title);
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
+        String[] items;
         switch (item.getItemId()) {
             case R.id.tram:
+                items = getResources().getStringArray(R.array.trams);
+                showTransportList("Choose a tram", items);
                 return true;
             case R.id.trolley:
+                items = getResources().getStringArray(R.array.trolleys);
+                showTransportList("Choose a trolley", items);
                 return true;
             case R.id.bus:
+                items = getResources().getStringArray(R.array.buses);
+                showTransportList("Choose a bus", items);
                 return true;
             case R.id.for_blind:
                 item.setChecked(!item.isChecked());

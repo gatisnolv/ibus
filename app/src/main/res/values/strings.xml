@@ -7,98 +7,93 @@
     <string name="trolley">Trolley</string>
     <string name="for_blind">For blind</string>
 
+    <string-array name="trams">
+        <item>1 Imanta - Jugla</item>
+        <item>2 Centrāltirgus - Tapešu iela</item>
+        <item>3 Jugla - Ķengarags</item>
+        <item>5 Iļģuciems - Mīlgrāvis</item>
+        <item>7 Ausekļa iela - Ķengarags</item>
+        <item>9 Aldaris - Ķengarags</item>
+        <item>10 Centrāltirgus - Bišumuiža</item>
+        <item>11 Ausekļa iela - Mežaparks</item>
+    </string-array>
 
+    <string-array name="buses">
+        <item>1 Abrenes_iela - Berģuciems - Dreiliņi</item>
+        <item>2 Abrenes_iela - Vecmīlgrāvis</item>
+        <item>3 Daugavgrīva - Pļavnieki</item>
+        <item>4 Abrenes iela - Piņķi</item>
+        <item>4z Abrenes iela - Zolitūde</item>
+        <item>5 Abrenes iela - Mežciems</item>
+        <item>6 Abrenes iela - Dreiliņi</item>
+        <item>7 Abrenes iela - Stīpnieki</item>
+        <item>8 Stacijas laukums - Zolitūde</item>
+        <item>9 Abrenes iela - Mežaparks</item>
+        <item>10 Abrenes iela - Brūkleņu iela - Jaunmārupe</item>
+        <item>11 Abrenes iela - Jaunciems - Suži</item>
+        <item>12 Abrenes iela - Kooperatīvs "Ziedonis"</item>
+        <item>13 Babītes stacija - Kleisti - Preču 2</item>
+        <item>14 Abrenes iela - Zvēraudzētava</item>
+        <item>15 Dārziņi - Jugla</item>
+        <item>16 Abrenes iela - Papīrfabrika "Jugla"</item>
+        <item>18 Abrenes iela - Dārziņi</item>
+        <item>19 Mežciems - Bukulti - Sarkandaugava</item>
+        <item>20 Pētersalas iela - Pļavnieku kapi</item>
+        <item>21 Imanta - Jugla</item>
+        <item>22 Abrenes iela - Lidosta</item>
+        <item>23 Abrenes iela - Baloži</item>
+        <item>24 Abrenes iela - Mangaļsala</item>
+        <item>25 Abrenes iela - Mārupe</item>
+        <item>26 Abrenes iela - Katlakalns</item>
+        <item>28 Jugla - Langstiņi</item>
+        <item>29 Mežciems - Vecmīlgrāvis</item>
+        <item>30 Centrālā stacija - Daugavgrīva</item>
+        <item>31 Dārziņi - Jugla</item>
+        <item>32 Abrenes iela - Piņķi</item>
+        <item>34 Centrāltirgus - Saulīši</item>
+        <item>35 Abrenes iela - Pleskodāle</item>
+        <item>36 Imanta - Vakarbuļļi</item>
+        <item>37 Esplanāde - Imanta</item>
+        <item>38 Abrenes iela - Dzirciema iela</item>
+        <item>39 Abrenes iela - Lāčupes kapi</item>
+        <item>40 Jugla - Ziepniekkalns</item>
+        <item>41 Esplanāde - Imanta</item>
+        <item>43 Abrenes iela - Skulte</item>
+        <item>44 Ziepniekkalns - Zolitūde</item>
+        <item>46 Ziepniekkalns - Zolitūde</item>
+        <item>47 Abrenes iela - Šķirotava</item>
+        <item>48 Pļavnieku kapi - Sarkandaugava</item>
+        <item>49 MAN TESS - Rumbula</item>
+        <item>50 Abrenes iela - TEC 2</item>
+        <item>51 Abrenes iela - Ulbroka</item>
+        <item>52 Abrenes iela - Pļavnieku kapi</item>
+        <item>53 Esplanāde - Zolitūde</item>
+        <item>54 Abrenes iela - Voleri</item>
+        <item>55 Abrenes iela - Jaunmārupe</item>
+        <item>56 Daugavgrīva - Ziepniekkalns</item>
+        <item>57 Abrenes iela - Ķīpsala</item>
+        <item>58 Purvciems - Vecmīlgrāvis</item>
+        <item>59 Latvijas Universitāte - Televīzijas centrs</item>
+        <item>60 Ķengarags - Ziepniekkalns</item>
+    </string-array>
 
-
-
-    <string name="bus_1">1 Abrenes_iela - Berģuciems - Dreiliņi</string>
-    <string name="bus_2">2 Abrenes_iela - Vecmīlgrāvis</string>
-    <string name="bus_3">3 Daugavgrīva - Pļavnieki</string>
-    <string name="bus_4">4 Abrenes iela - Piņķi</string>
-    <string name="bus_4z">4z Abrenes iela - Zolitūde</string>
-    <string name="bus_5">5 Abrenes iela - Mežciems</string>
-    <string name="bus_6">6 Abrenes iela - Dreiliņi</string>
-    <string name="bus_7">7 Abrenes iela - Stīpnieki</string>
-    <string name="bus_8">8 Stacijas laukums - Zolitūde</string>
-    <string name="bus_9">9 Abrenes iela - Mežaparks</string>
-    <string name="bus_10">10 Abrenes iela - Brūkleņu iela - Jaunmārupe</string>
-    <string name="bus_11">11 Abrenes iela - Jaunciems - Suži</string>
-    <string name="bus_12">12 Abrenes iela - Kooperatīvs "Ziedonis"</string>
-    <string name="bus_13">13 Babītes stacija - Kleisti - Preču 2</string>
-    <string name="bus_14">14 Abrenes iela - Zvēraudzētava</string>
-    <string name="bus_15">15 Dārziņi - Jugla</string>
-    <string name="bus_16">16 Abrenes iela - Papīrfabrika "Jugla"</string>
-    <string name="bus_18">18 Abrenes iela - Dārziņi</string>
-    <string name="bus_19">19 Mežciems - Bukulti - Sarkandaugava</string>
-    <string name="bus_20">20 Pētersalas iela - Pļavnieku kapi</string>
-    <string name="bus_21">21 Imanta - Jugla</string>
-    <string name="bus_22">22 Abrenes iela - Lidosta</string>
-    <string name="bus_23">23 Abrenes iela - Baloži</string>
-    <string name="bus_24">24 Abrenes iela - Mangaļsala</string>
-    <string name="bus_25">25 Abrenes iela - Mārupe</string>
-    <string name="bus_26">26 Abrenes iela - Katlakalns</string>
-    <string name="bus_28">28 Jugla - Langstiņi</string>
-    <string name="bus_29">29 Mežciems - Vecmīlgrāvis</string>
-    <string name="bus_30">30 Centrālā stacija - Daugavgrīva</string>
-    <string name="bus_31">31 Dārziņi - Jugla</string>
-    <string name="bus_32">32 Abrenes iela - Piņķi</string>
-    <string name="bus_34">34 Centrāltirgus - Saulīši</string>
-    <string name="bus_35">35 Abrenes iela - Pleskodāle</string>
-    <string name="bus_36">36 Imanta - Vakarbuļļi</string>
-    <string name="bus_37">37 Esplanāde - Imanta</string>
-    <string name="bus_38">38 Abrenes iela - Dzirciema iela</string>
-    <string name="bus_39">39 Abrenes iela - Lāčupes kapi</string>
-    <string name="bus_40">40 Jugla - Ziepniekkalns</string>
-    <string name="bus_41">41 Esplanāde - Imanta</string>
-    <string name="bus_43">43 Abrenes iela - Skulte</string>
-    <string name="bus_44">44 Ziepniekkalns - Zolitūde</string>
-    <string name="bus_46">46 Ziepniekkalns - Zolitūde</string>
-    <string name="bus_47">47 Abrenes iela - Šķirotava</string>
-    <string name="bus_48">48 Pļavnieku kapi - Sarkandaugava</string>
-    <string name="bus_49">49 MAN TESS - Rumbula</string>
-    <string name="bus_50">50 Abrenes iela - TEC 2</string>
-    <string name="bus_51">51 Abrenes iela - Ulbroka</string>
-    <string name="bus_52">52_Abrenes iela - Pļavnieku kapi</string>
-    <string name="bus_53">53 Esplanāde - Zolitūde</string>
-    <string name="bus_54">54 Abrenes iela - Voleri</string>
-    <string name="bus_55">55 Abrenes iela - Jaunmārupe</string>
-    <string name="bus_56">56 Daugavgrīva - Ziepniekkalns</string>
-    <string name="bus_57">57 Abrenes iela - Ķīpsala</string>
-    <string name="bus_58">58 Purvciems - Vecmīlgrāvis</string>
-    <string name="bus_59">59 Latvijas Universitāte - Televīzijas centrs</string>
-    <string name="bus_60">60 Ķengarags - Ziepniekkalns</string>
-
-
-
-    <string name="tram_1">1 Imanta - Jugla</string>
-    <string name="tram_2">2 Centrāltirgus - Tapešu iela</string>
-    <string name="tram_3">3 Jugla - Ķengarags</string>
-    <string name="tram_5">5 Iļģuciems - Mīlgrāvis</string>
-    <string name="tram_7">7 Ausekļa iela - Ķengarags</string>
-    <string name="tram_9">9 Aldaris - Ķengarags</string>
-    <string name="tram_10">10 Centrāltirgus - Bišumuiža</string>
-    <string name="tram_11">11 Ausekļa iela - Mežaparks</string>
-
-
-
-
-
-    <string name="trolley_1">1 Valmieras iela - Pētersalas iela</string>
-    <string name="trolley_3">3 Centrāltirgus - Sarkandaugava</string>
-    <string name="trolley_5">5 Daugavas stadions - Paula Stradiņa slimnīca - Mežaparks</string>
-    <string name="trolley_9">9 Stacijas laukums - Iļģuciems</string>
-    <string name="trolley_12">12 Āgenskalna priedes - Šmerlis</string>
-    <string name="trolley_13">13 Centrāltirgus - Ieriķu iela</string>
-    <string name="trolley_14">14 Esplanāde - Mežciems</string>
-    <string name="trolley_15">15 Latvijas Universitāte - Ķengarags</string>
-    <string name="trolley_16">16 Pļavnieki - Šmerlis</string>
-    <string name="trolley_17">17 Centrālā stacija - Purvciems</string>
-    <string name="trolley_18">18 Centrālā stacija - Mežciems</string>
-    <string name="trolley_19">19 Pētersalas iela - Ziepniekkalns</string>
-    <string name="trolley_22">22 Centrālā stacija - Pļavnieki</string>
-    <string name="trolley_23">23 Centrālā stacija - Purvciems - Pļavnieki</string>
-    <string name="trolley_25">25 Brīvības iela - Iļģuciems - Pļavnieki</string>
-    <string name="trolley_27">27 Stacijas laukums - Ziepniekkalns</string>
-
+    <string-array name="trolleys">
+        <item>1 Valmieras iela - Pētersalas iela</item>
+        <item>3 Centrāltirgus - Sarkandaugava</item>
+        <item>5 Daugavas stadions - Paula Stradiņa slimnīca</item>
+        <item>9 Stacijas laukums - Iļģuciems</item>
+        <item>12 Āgenskalna priedes - Šmerlis</item>
+        <item>13 Centrāltirgus - Ieriķu iela</item>
+        <item>14 Esplanāde - Mežciems</item>
+        <item>15 Latvijas Universitāte - Ķengarags</item>
+        <item>16 Pļavnieki - Šmerlis</item>
+        <item>17 Centrālā stacija - Purvciems</item>
+        <item>18 Centrālā stacija - Mežciems</item>
+        <item>19 Pētersalas iela - Ziepniekkalns</item>
+        <item>22 Centrālā stacija - Pļavnieki</item>
+        <item>23 Centrālā stacija - Purvciems</item>
+        <item>25 Brīvības iela - Iļģuciems</item>
+        <item>27 Stacijas laukums - Ziepniekkalns</item>
+    </string-array>
 
 </resources>
