@@ -48,6 +48,8 @@ public class MapsActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener
 {
+
+
     private GoogleMap mMap;
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
@@ -55,7 +57,7 @@ public class MapsActivity extends AppCompatActivity implements
     private Marker currentUserLocationMarker;
     private static final int Request_User_Location_Code = 99;
     private double latitide, longitude;
-Context context;
+    Context context;
 
     private static final String LOG = "MapLog";
 
@@ -76,7 +78,7 @@ Context context;
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-context = this;
+        context = this;
     }
 
     /** Method for resizing marker
@@ -95,9 +97,9 @@ context = this;
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)            {
             buildGoogleApiClient();
-//            mMap.setMyLocationEnabled(true);
+            mMap.setMyLocationEnabled(true);
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(56.946285, 24.105078), 15)); //56.946285, 24.105078
 
@@ -256,7 +258,6 @@ context = this;
     @Override
     public void onConnectionSuspended(int i) {
     }
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
     }
