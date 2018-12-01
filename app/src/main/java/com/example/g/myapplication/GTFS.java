@@ -56,7 +56,11 @@ public class GTFS {
     private static final int TRIPS_SHAPE_ID = 6;
 
 
-    private class Route {
+    private class Route implements Comparable<Route> {
+        private static final String BUS4Z = "4z";
+        private static final int GREATER = 1;
+        private static final int LESS = -1;
+
 
         private String id;
 
@@ -92,26 +96,48 @@ public class GTFS {
             trips.add(trip);
         }
 
+        @Override
+        public int compareTo(Route input) {
+            if (this.short_name.equals(BUS4Z)) {
+                if (input.short_name.equals(BUS4Z)) {//both are 4z
+                    return 0;
+                }
+                if (Integer.parseInt(input.short_name) < 5) {
+                    return GREATER;
+                } else {//input.shortname >=5
+                    return LESS;
+                }
+            } else if (input.short_name.equals(BUS4Z)) {
+                if (Integer.parseInt(this.short_name) < 5) {
+                    return LESS;
+                } else {//this.shortname>=5
+                    return GREATER;
+                }
+            } else {
+                return this.id.compareTo(input.id);
+            }
+        }
+
 
     }
 
     private class Trip {
-        private int id;
+        private int tripId;
+        private int serviceId;
         private String headsign;
         private boolean direction;
-        //            private String shape_id;
-        private int service_id;
-        //            private List<Coordinate> shape;
+        private int shape_id;
+        private List<Coordinate> shape;
         private boolean[] calendar;
         List<Stop> stops;
 
 
-        public Trip(int id, String headsign, boolean direction, String shape_id, int service_id) {
-            this.id = id;
+        public Trip(int tripId, int serviceId, String headsign, boolean direction, int shape_id) {
+            this.tripId = tripId;
+            this.serviceId = serviceId;
             this.headsign = headsign;
             this.direction = direction;
-//                this.shape_id = shape_id;
-            this.service_id = service_id;
+            this.shape_id = shape_id;
         }
     }
 
@@ -145,6 +171,9 @@ public class GTFS {
     private HashMap<String, Route> busses;
     private HashMap<String, Route> trolleys;
     private HashMap<String, Route> trams;
+    private HashMap<String, Route> allTransports;
+
+    private HashMap<Integer, Trip> shapeIdsToTrips;//TODO initialize maps
 
     private Context cxt;
 
@@ -201,6 +230,20 @@ public class GTFS {
         }
         Route route = new Route(routeId, routeShortName, routeLongName, routeType);
         map.put(routeId, route);
+        allTransports.put(routeId, route);
+    }
+
+    private void readTrip(CsvRow input) {
+        String routeId = input.getField(TRIPS_ROUTE_ID);
+        int serviceId = Integer.parseInt(input.getField(SERVICE_ID));
+        int tripId = Integer.parseInt(input.getField(TRIP_ID));
+        String headsign = input.getField(TRIP_HEADSIGN);
+        boolean direction = Boolean.parseBoolean(input.getField(DIRECTION_ID));
+        int shapeId = Integer.parseInt(input.getField(TRIPS_SHAPE_ID));
+
+        Trip trip = new Trip(tripId, serviceId, headsign, direction, shapeId);
+        allTransports.get(routeId).addTrip(trip);
+        shapeIdsToTrips.put(shapeId, trip);
     }
 
     private void readStop(CsvRow input) {
@@ -216,10 +259,6 @@ public class GTFS {
     }
 
     private void readStopTime(CsvRow input) {
-
-    }
-
-    private void readTrip(CsvRow input) {
 
     }
 
@@ -258,7 +297,7 @@ public class GTFS {
         System.out.println("tstcount1: " + stopsContainer.getRow(1664).getField(STOP_NAME));
         System.out.println("tstcount2: " + shapesContainer.getRow(65854).getField(SHAPE_ID));
         System.out.println("tstcount3: " + routesContainer.getRow(80).getField(ROUTE_ID));
-        System.out.println("tstcount4: " + calendarContainer.getRow(152).getField(SERVICE_ID));
+//        System.out.println("tstcount4: " + calendarContainer.getRow(152).getField(SERVICE_ID));
         System.out.println("tstcount5: " + stop_timesContainer.getRow(351083).getField(TRIP_ID));
         System.out.println("tstcount6: " + tripsContainer.getRow(14426).getField(TRIP_HEADSIGN));
 
@@ -278,10 +317,10 @@ public class GTFS {
         }
         System.out.printf("end route_id: " + routesContainer.getRow(80).getField(ROUTE_ID) + "\n");
 
-        for (CsvRow row : calendarContainer.getRows()) {
-            System.out.println("service_id: " + row.getField(SERVICE_ID));
-        }
-        System.out.printf("end service_id: " + calendarContainer.getRow(152).getField(SERVICE_ID) + "\n");
+//        for (CsvRow row : calendarContainer.getRows()) {
+//            System.out.println("service_id: " + row.getField(SERVICE_ID));
+//        }
+//        System.out.printf("end service_id: " + calendarContainer.getRow(152).getField(SERVICE_ID) + "\n");
 
         //        for (CsvRow row : stop_timesContainer.getRows()) {
 //            System.out.println("trip_id: " + row.getField(TRIP_ID));
