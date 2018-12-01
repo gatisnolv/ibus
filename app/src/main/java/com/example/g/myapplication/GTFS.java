@@ -9,6 +9,8 @@ import android.content.*;
 
 import de.siegmar.fastcsv.reader.*;
 
+import java.time.*;
+
 //import java.nio.charset.Charset;
 //import java.nio.charset.StandardCharsets;
 
@@ -92,6 +94,10 @@ public class GTFS {
             return type;
         }
 
+        public List<Trip> getTrips() {
+            return trips;
+        }
+
         public void addTrip(Trip trip) {
             trips.add(trip);
         }
@@ -126,13 +132,13 @@ public class GTFS {
         private int serviceId;
         private String headsign;
         private boolean direction;
-        private int shape_id;
-        private List<Coordinate> shape;
-        private boolean[] calendar;
+        private String shape_id;
+//        private List<Coordinate> shape;
+//        private boolean[] calendar;
         List<Stop> stops;
 
 
-        public Trip(int tripId, int serviceId, String headsign, boolean direction, int shape_id) {
+        public Trip(int tripId, int serviceId, String headsign, boolean direction, String shape_id) {
             this.tripId = tripId;
             this.serviceId = serviceId;
             this.headsign = headsign;
@@ -145,17 +151,55 @@ public class GTFS {
         private String id;
         private String name;
         private Coordinate coordinate;
+        private ArrayList<Route> routesWhoseTripsHaveThisStop;
+//        private ArrayList<Trip> tripsWithThisStop;
 
         public Stop(String id, String name, Coordinate coordinate) {
             this.id = id;
             this.name = name;
             this.coordinate = coordinate;
         }
+
+        public void addRoute(Route input) {
+            routesWhoseTripsHaveThisStop.add(input);
+        }
+
+        public List<Route> getRoutes() {
+            return routesWhoseTripsHaveThisStop;
+        }
     }
 
     private class Coordinate {
+        private static final int NO_SEQUENCE = 0;
         private float lat;
         private float lon;
+        private int seqNr;
+
+        Coordinate(float lat, float lon) {
+            this(lat, lon, NO_SEQUENCE);
+        }
+
+        Coordinate(float lat, float lon, int seqNr) {
+            this.lat = lat;
+            this.lon = lon;
+            this.seqNr = seqNr;
+        }
+
+
+        public float getLat() {
+            return lat;
+        }
+
+        public float getLon() {
+            return lon;
+        }
+
+        public double getDifference(Coordinate input) {
+            float absLatDiff = Math.abs(this.lat - input.lat);
+            float absLonDiff = Math.abs(this.lon - input.lon);
+
+            return Math.sqrt(Math.pow(absLatDiff, 2) + Math.pow(absLonDiff, 2));//TODO implement
+        }
     }
 
     //    private static final Charset UTF8 = StandardCharsets.UTF_8;
@@ -167,15 +211,21 @@ public class GTFS {
     private CsvContainer calendarContainer;
     private CsvContainer stop_timesContainer;
     private CsvContainer tripsContainer;
-
-    private HashMap<String, Route> busses;
-    private HashMap<String, Route> trolleys;
-    private HashMap<String, Route> trams;
-    private HashMap<String, Route> allTransports;
-
-    private HashMap<Integer, Trip> shapeIdsToTrips;//TODO initialize maps
-
     private Context cxt;
+
+    private HashMap<String, Route> routeIdsToBusRoutes;////TODO initialize hashmaps
+    private HashMap<String, Route> routeIdsToTrolleyRoutes;
+    private HashMap<String, Route> routeIdsToTramRoutes;
+    private HashMap<String, Route> routeIdsToAllRoutes;
+
+//    private HashMap<String, List<Trip>> shapeIdsToTrips;
+//    private HashMap<Integer, List<Trip>> serviceIdsToTrips;
+//    private HashMap<Integer, Trip> tripIdsToTrips;
+
+    private HashMap<String, Stop> stopIdsToStops;
+    private HashMap<String, boolean[]> serviceIdsToCalendars;
+    private HashMap<String, List<Coordinate>> shapeIdsToShapes;
+
 
     GTFS(Context context) {
         this.cxt = context;
@@ -222,15 +272,15 @@ public class GTFS {
         HashMap<String, Route> map;
 
         if (routeType == BUS) {
-            map = busses;
+            map = routeIdsToBusRoutes;
         } else if (routeType == TROLLEY) {
-            map = trolleys;
+            map = routeIdsToTrolleyRoutes;
         } else {//TRAM
-            map = trams;
+            map = routeIdsToTramRoutes;
         }
         Route route = new Route(routeId, routeShortName, routeLongName, routeType);
         map.put(routeId, route);
-        allTransports.put(routeId, route);
+        routeIdsToAllRoutes.put(routeId, route);
     }
 
     private void readTrip(CsvRow input) {
@@ -239,26 +289,45 @@ public class GTFS {
         int tripId = Integer.parseInt(input.getField(TRIP_ID));
         String headsign = input.getField(TRIP_HEADSIGN);
         boolean direction = Boolean.parseBoolean(input.getField(DIRECTION_ID));
-        int shapeId = Integer.parseInt(input.getField(TRIPS_SHAPE_ID));
+        String shapeId = input.getField(TRIPS_SHAPE_ID);
 
         Trip trip = new Trip(tripId, serviceId, headsign, direction, shapeId);
-        allTransports.get(routeId).addTrip(trip);
-        shapeIdsToTrips.put(shapeId, trip);
+        routeIdsToAllRoutes.get(routeId).addTrip(trip);
+//        shapeIdsToTrips.put(shapeId, trip); //not that simple here
     }
 
     private void readStop(CsvRow input) {
+        String id = input.getField(STOP_ID);
+        String name = input.getField(STOP_NAME);
+        float stopLat = Float.parseFloat(input.getField(STOP_LAT));
+        float stopLon = Float.parseFloat(input.getField(STOP_LON));
+
+        Coordinate coordinate = new Coordinate(stopLat, stopLon);
+        Stop stop = new Stop(id, name, coordinate);
+        stopIdsToStops.put(id, stop);
+    }
+
+    private void readStopTime(CsvRow input) {
+        int tripId = Integer.parseInt(input.getField(STOP_TIMES_TRIP_ID));
+        LocalTime arrivalTime = LocalTime.parse(input.getField(ARRIVAL_TIME));
+        LocalTime departureTime = LocalTime.parse(input.getField(DEPARTURE_TIME));
+        String stopId = input.getField(STOP_TIMES_STOP_ID);
+        int stopSequence = Integer.parseInt(input.getField(STOP_SEQUENCE));
+
 
     }
 
     private void readShapePt(CsvRow input) {
+        String shapeId = input.getField(SHAPE_ID);
+        float shapePtLat = Float.parseFloat(input.getField(SHAPE_PT_LAT));
+        float shapePtLon = Float.parseFloat(input.getField(SHAPE_PT_LON));
+        int shapePtSeq = Integer.parseInt(input.getField(SHAPE_PT_SEQUENCE));
+
+        Coordinate shapePt = new Coordinate(shapePtLat, shapePtLon, shapePtSeq);
 
     }
 
     private void readCalendar(CsvRow input) {
-
-    }
-
-    private void readStopTime(CsvRow input) {
 
     }
 
