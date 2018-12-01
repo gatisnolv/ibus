@@ -128,13 +128,14 @@ public class GTFS {
     }
 
     private class Trip {
+        private Route route; //routeId
         private int tripId;
         private int serviceId;
         private String headsign;
         private boolean direction;
         private String shape_id;
-//        private List<Coordinate> shape;
-//        private boolean[] calendar;
+        private List<Coordinate> shape;
+        private boolean[] calendar;
         List<Stop> stops;
 
 
@@ -151,8 +152,8 @@ public class GTFS {
         private String id;
         private String name;
         private Coordinate coordinate;
-        private ArrayList<Route> routesWhoseTripsHaveThisStop;
-//        private ArrayList<Trip> tripsWithThisStop;
+        private List<Route> routesWhoseTripsHaveThisStop;
+//        private List<Trip> tripsWithThisStop;//or maybe map stop to route - not sure yet
 
         public Stop(String id, String name, Coordinate coordinate) {
             this.id = id;
@@ -202,8 +203,7 @@ public class GTFS {
         }
     }
 
-    //    private static final Charset UTF8 = StandardCharsets.UTF_8;
-    private static final String BOM = "\uFEFF";//Addressing first column by name should be prepended with this, or access fields by index
+    private static final String BOM = "\uFEFF";//Addressing first column by name should be prepended with this, or alternatively access fields by index
 
     private CsvContainer stopsContainer;
     private CsvContainer shapesContainer;
@@ -218,12 +218,10 @@ public class GTFS {
     private HashMap<String, Route> routeIdsToTramRoutes;
     private HashMap<String, Route> routeIdsToAllRoutes;
 
-//    private HashMap<String, List<Trip>> shapeIdsToTrips;
-//    private HashMap<Integer, List<Trip>> serviceIdsToTrips;
-//    private HashMap<Integer, Trip> tripIdsToTrips;
+//    private HashMap<Integer, Trip> tripIdsToTrips;//likely not needed
 
     private HashMap<String, Stop> stopIdsToStops;
-    private HashMap<String, boolean[]> serviceIdsToCalendars;
+    private HashMap<Integer, boolean[]> serviceIdsToCalendars;
     private HashMap<String, List<Coordinate>> shapeIdsToShapes;
 
 
@@ -293,7 +291,6 @@ public class GTFS {
 
         Trip trip = new Trip(tripId, serviceId, headsign, direction, shapeId);
         routeIdsToAllRoutes.get(routeId).addTrip(trip);
-//        shapeIdsToTrips.put(shapeId, trip); //not that simple here
     }
 
     private void readStop(CsvRow input) {
@@ -307,51 +304,73 @@ public class GTFS {
         stopIdsToStops.put(id, stop);
     }
 
-    private void readStopTime(CsvRow input) {
-        int tripId = Integer.parseInt(input.getField(STOP_TIMES_TRIP_ID));
-        LocalTime arrivalTime = LocalTime.parse(input.getField(ARRIVAL_TIME));
-        LocalTime departureTime = LocalTime.parse(input.getField(DEPARTURE_TIME));
-        String stopId = input.getField(STOP_TIMES_STOP_ID);
-        int stopSequence = Integer.parseInt(input.getField(STOP_SEQUENCE));
-
-
-    }
-
-    private void readShapePt(CsvRow input) {
-        String shapeId = input.getField(SHAPE_ID);
-        float shapePtLat = Float.parseFloat(input.getField(SHAPE_PT_LAT));
-        float shapePtLon = Float.parseFloat(input.getField(SHAPE_PT_LON));
-        int shapePtSeq = Integer.parseInt(input.getField(SHAPE_PT_SEQUENCE));
-
-        Coordinate shapePt = new Coordinate(shapePtLat, shapePtLon, shapePtSeq);
-
-    }
-
     private void readCalendar(CsvRow input) {
+        int serviceId = Integer.parseInt(input.getField(CALENDAR_SERVICE_ID));
+        boolean monday = Boolean.parseBoolean(input.getField(MONDAY));
+        boolean tuesday = Boolean.parseBoolean(input.getField(TUESDAY));
+        boolean wednesday = Boolean.parseBoolean(input.getField(WEDNESDAY));
+        boolean thursday = Boolean.parseBoolean(input.getField(THURSDAY));
+        boolean friday = Boolean.parseBoolean(input.getField(FRIDAY));
+        boolean saturday = Boolean.parseBoolean(input.getField(SATURDAY));
+        boolean sunday = Boolean.parseBoolean(input.getField(SUNDAY));
+        boolean[] calendar = {monday, tuesday, wednesday, thursday, friday, saturday, sunday};
+
+        serviceIdsToCalendars.put(serviceId, calendar);
+    }
+
+
+    //    private void readStopTime(CsvRow input) {
+//        int tripId = Integer.parseInt(input.getField(STOP_TIMES_TRIP_ID));
+//        LocalTime arrivalTime = LocalTime.parse(input.getField(ARRIVAL_TIME));
+//        LocalTime departureTime = LocalTime.parse(input.getField(DEPARTURE_TIME));
+//        String stopId = input.getField(STOP_TIMES_STOP_ID);
+//        int stopSequence = Integer.parseInt(input.getField(STOP_SEQUENCE));
+//
+//
+//    }
+
+    //    private void readShapePt(CsvRow input) {
+//        String shapeId = input.getField(SHAPE_ID);
+//        float shapePtLat = Float.parseFloat(input.getField(SHAPE_PT_LAT));
+//        float shapePtLon = Float.parseFloat(input.getField(SHAPE_PT_LON));
+//        int shapePtSeq = Integer.parseInt(input.getField(SHAPE_PT_SEQUENCE));
+//
+//        Coordinate shapePt = new Coordinate(shapePtLat, shapePtLon, shapePtSeq);
+//
+//        //process whole shape and only then add to shapeIdsToShapes map, so not here where only one point is processed, but higher up (method call wise)
+//    }
+    private void readShapes() {
+//TODO implement
+
+//        for (CsvRow shapePt : shapesContainer.getRows()) {
+//            readShapePt(shapePt);
+//        }
+
+    }
+
+    private void readStopTimes() {
+//TODO implement
+//        for (CsvRow stopTime : stop_timesContainer.getRows()) {
+//            readStopTime(stopTime);
+//        }
 
     }
 
     private void getGTFS() {
-        //TODO implement
         for (CsvRow route : routesContainer.getRows()) {
             readRoute(route);
-        }
-        for (CsvRow trip : tripsContainer.getRows()) {
-            readTrip(trip);
         }
         for (CsvRow stop : stopsContainer.getRows()) {
             readStop(stop);
         }
-        for (CsvRow shapePt : shapesContainer.getRows()) {
-            readShapePt(shapePt);
-        }
         for (CsvRow calendar : calendarContainer.getRows()) {
             readCalendar(calendar);
         }
-        for (CsvRow stopTime : stop_timesContainer.getRows()) {
-            readStopTime(stopTime);
+        readShapes();
+        readStopTimes();
+        for (CsvRow trip : tripsContainer.getRows()) {
+            readTrip(trip);
         }
-
     }
 
     private void test() {
