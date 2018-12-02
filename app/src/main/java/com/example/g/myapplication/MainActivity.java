@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int DEFAULT_ZOOM = 10;
     private static final int PERMISSIONS_GRANTED_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private boolean mLocationPermissionGranted;
+    private boolean mLocationPermissionGranted=false;
 
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
@@ -171,11 +171,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Prompt the user for permission.
         getLocationPermission();
 
+        // Get the current location of the device and set the position of the map.
+        getDeviceLocation();
+
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
 
-        // Get the current location of the device and set the position of the map.
-        getDeviceLocation();
     }
 
     /**
@@ -195,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                                     new LatLng(mLastKnownLocation.getLatitude(),
                                             mLastKnownLocation.getLongitude()), PERMISSIONS_GRANTED_ZOOM));
                         } else {
@@ -207,6 +208,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
                 });
+            }else {//if user doesn't grant permission, move camera to center on Riga
+                mMap.moveCamera(CameraUpdateFactory
+                        .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+                mMap.getUiSettings().setMyLocationButtonEnabled(false);
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
@@ -252,6 +257,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
         updateLocationUI();
+        getDeviceLocation();//it makes sense for this to be here, because otherwise the camera location will not be repositioned
     }
 
     /**
@@ -269,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mMap.setMyLocationEnabled(false);
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
                 mLastKnownLocation = null;
-                getLocationPermission();
+//                getLocationPermission();//removing this should enable preventing infinite loop
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
