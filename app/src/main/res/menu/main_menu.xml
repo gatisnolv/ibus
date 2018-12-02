@@ -3,26 +3,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:menuCategory="container">
         <item
-            android:checkable="false"
-            android:enabled="false"
-            android:title="@string/choose"/>
-
-        <item
-            android:id="@+id/bus"
-            android:title="@string/bus"/>
-
-        <item
-            android:id="@+id/tram"
-            android:title="@string/tram"
-            android:icon="@drawable/ic_tram"/>
-
-        <item
-            android:id="@+id/trolley"
-            android:title="@string/trolley"/>
-
-        <item
-            android:id="@+id/for_blind"
-            android:title="@string/for_blind"
-            android:checkable="true"/>
+            app:showAsAction="ifRoom"
+            android:icon="@drawable/ic_menu">
+            <menu>
+                <item
+                    android:id="@+id/bus"
+                    android:title="@string/bus"
+                    android:icon="@drawable/ic_bus" />
+                <item
+                    android:id="@+id/tram"
+                    android:title="@string/tram"
+                    android:icon="@drawable/ic_tram"/>
+                <item
+                    android:id="@+id/trolley"
+                    android:title="@string/trolley"
+                    android:icon="@drawable/ic_trolley"/>
+                <item
+                    android:id="@+id/for_blind"
+                    android:title="@string/for_blind"
+                    android:icon="@drawable/ic_blind"
+                    android:checkable="true"/>
+            </menu>
+        </item>
     </group>
 </menu>

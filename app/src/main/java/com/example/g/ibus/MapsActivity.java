@@ -86,7 +86,7 @@ public class MapsActivity extends AppCompatActivity implements
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                //TODO Implement further selection
             }
         });
         AlertDialog dialog = builder.create();
@@ -211,3 +211,6 @@ public class MapsActivity extends AppCompatActivity implements
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
     }
 }
+
+
+
