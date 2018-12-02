@@ -109,7 +109,7 @@ public class MapsActivity extends AppCompatActivity implements
         final Marker testBus = mMap.addMarker(new MarkerOptions()
                 .position(posStart)
                 .draggable(true)
-                .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("bus",40,40)))
+                .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("ic_bus",40,40)))
 //                .icon(BitmapDescriptorFactory.fromResource(R.drawable.bus)) --old/simple way of creating icon
                 /* .title("testBus") */ );
 
