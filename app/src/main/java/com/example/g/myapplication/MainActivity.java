@@ -1,5 +1,9 @@
 package com.example.g.myapplication;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
@@ -30,8 +34,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.maps.android.SphericalUtil;
+
 import android.content.res.Resources;
 
 import de.siegmar.fastcsv.reader.*;
@@ -66,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //-----------------
     private GTFS gtfs;
     private boolean locationPermissionGrantedPreviously = false;
+    Marker stopMarker;
 
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +129,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        int busRouteIdOffset = 100;
+        int trolleyRouteIdOffset = 200;
+        int tramRouteIdOffset = 300;
         getMenuInflater().inflate(R.menu.user_options_menu, menu);
+        for (int i = 0; i < 20; i++) {
+            MenuItem item = menu.getItem(0).getSubMenu().getItem(0).getSubMenu().add(Menu.NONE, busRouteIdOffset + i, i, "this is a long string");
+//            Log.d("sometag","a"+Integer.toString(item.getItemId()));
+        }
+//        Log.d("sometag",getString(menu.getItem(0).getItemId()));
+//        Log.d("sometag",menu.getItem(0).getTitle().toString()+menu.getItem(0).getSubMenu().getItem(0).hasSubMenu());
+
         return true;
     }
 
@@ -133,8 +151,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_name) {
-//            showCurrentPlace();
+        int itemId = item.getItemId();
+        switch (itemId) {
+            case R.id.menu_name:
+//                item.ge
+                Log.d("sometag", "this happened");
+                break;
+            case R.id.bus_menu:
+                Log.d("sometag", "this2 happened");
+                break;
+            case R.id.trolley_menu:
+                Log.d("sometag", "this3 happened");
+                break;
+            case R.id.tram_menu:
+                Log.d("sometag", "this4 happened");
+                break;
+            default:
+                Log.d("sometag", "id: " + itemId);
+                if (itemId >= 100 && itemId < 400) {
+                    Log.d("sometag", "this");
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(mDefaultLocation));
+                }
+
         }
         return true;
     }
@@ -195,6 +233,85 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
 
+//        final Calendar calendarInstance=Calendar.getInstance();
+//        BroadcastReceiver minutesReceiver=new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                stopMarker.setTitle(Integer.toString(calendarInstance.get(Calendar.HOUR))+":"
+//                        +Integer.toString(calendarInstance.get(Calendar.MINUTE)));
+//                stopMarker.showInfoWindow();
+//            }
+//        };
+//
+//        registerReceiver(minutesReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
+
+
+    }
+
+    public void findClosestStop(View view) {
+        List<LatLng> stopList = new ArrayList<>();
+        stopList.add(new LatLng(56.968985, 24.188312));
+        stopList.add(new LatLng(56.969662, 24.184618));
+        stopList.add(new LatLng(56.977891, 24.182042));
+
+        LatLng currentLoc = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+        LatLng closestStop = currentLoc; //iffy initialization
+        float closestDistance = Integer.MAX_VALUE;
+
+        for (LatLng stop : stopList) {
+            float distance = (float) SphericalUtil.computeDistanceBetween(stop, currentLoc);
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestStop = stop;
+            }
+        }
+
+        //move to midpoint between currentLoc, and closest stop
+        LatLng midpoint = SphericalUtil.interpolate(currentLoc, closestStop, 0.5);
+
+        mMap.addMarker(new MarkerOptions().position(currentLoc).title("Current loc"));
+        stopMarker = mMap.addMarker(new MarkerOptions().position(closestStop).title("Closest stop"));
+//        stopMarker
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(midpoint));
+        updateMarkerInfo();
+
+
+    }
+
+    public void updateHere(int h, int m, int s) {
+        stopMarker.setTitle(h + ":" + m + ":" + s);
+        if (stopMarker.isInfoWindowShown()) {
+            stopMarker.showInfoWindow();
+
+        }
+    }
+
+    public void updateMarkerInfo() {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {//fix to have only one such thread running at a time
+            @Override
+            public void run() {
+                Calendar c = Calendar.getInstance();
+//                int mYear = c.get(Calendar.YEAR);
+//                int mMonth = c.get(Calendar.MONTH);
+//                int mDay = c.get(Calendar.DAY_OF_MONTH);
+                final int mHour = c.get(Calendar.HOUR_OF_DAY);
+                final int mMinute = c.get(Calendar.MINUTE);
+                final int mSecond = c.get(Calendar.SECOND);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateHere(mHour, mMinute, mSecond);
+                        Log.d("freq","test");
+                    }
+                });
+
+//                stopMarker.setTitle(Integer.toString(mHour) + ":" + Integer.toString(mMinute) + ":" + Integer.toString(mSecond));
+//                stopMarker.showInfoWindow();
+            }
+
+        }, 0, 1000);
     }
 
     /**

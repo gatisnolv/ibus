@@ -4,5 +4,14 @@
     <item
         android:id="@+id/menu_name"
         android:title="@string/menu_name"
-        app:showAsAction="always"/>
+        app:showAsAction="always">
+        <menu>
+            <item android:id="@+id/bus_menu"
+                android:title="@string/bus"><menu></menu> </item>
+            <item android:id="@+id/trolley_menu"
+                android:title="@string/trolley"><menu></menu> </item>
+            <item android:id="@+id/tram_menu"
+                android:title="@string/tram"><menu></menu></item>
+        </menu>
+    </item>
 </menu>
