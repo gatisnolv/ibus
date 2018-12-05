@@ -106,23 +106,28 @@ public class MapsActivity extends AppCompatActivity implements
         Log.i(LOG, "onMapReady()");
 
 
+        mMap.setOnMarkerClickListener(this);
+
         final Marker testBus = mMap.addMarker(new MarkerOptions()
-                .position(posStart)
-                .draggable(true)
-                .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("ic_bus",40,40)))
+                        .position(posStart)
+                        .draggable(true)
+                        .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("ic_bus",40,40)))
 //                .icon(BitmapDescriptorFactory.fromResource(R.drawable.bus)) --old/simple way of creating icon
                 /* .title("testBus") */ );
 
-        // Set a listener for marker click.
-        mMap.setOnMarkerClickListener(this);
+        mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(56.94, 24.1))
+                        .title("Bus stop")
+                        .snippet("Next bus in 5 minutes"));
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-//            marker.setPosition(...);
-            animateMarker(marker, posFinish,false);
-        return true;
+        //animateMarker(marker, posFinish,false);
+        marker.showInfoWindow();
+        return false;
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
