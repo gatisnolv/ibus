@@ -80,10 +80,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private boolean locationPermissionGrantedPreviously = false;
     private Marker stopMarker;
     private Marker currentLocationMarker;
-    boolean runMarkerUpdateTimer;
     Timer timer;
     TimerTask timerTask;
-    Context mContext=this;
+    Context mContext = this;
     ObjectAnimator animator;
 
     @Override
@@ -328,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onMarkerClick(Marker marker) {
         if (marker.equals(stopMarker)) {
             Log.d("sometag", "stopMark");
-            if(!stopMarker.isInfoWindowShown()){
+            if (!stopMarker.isInfoWindowShown()) {
                 updateMarkerInfo();
             }
 //            InfoWindow infoWindow=new
@@ -344,9 +343,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onInfoWindowClose(Marker marker) {//when pressing marker with open infowindow, close event appears to always happen before reopen, so handling the start/stop of timer should not be a problem
         if (marker.equals(stopMarker)) {
             Log.d("sometag", "closeEvent");
-            runMarkerUpdateTimer=false;
-            TimerTask prevTimerTask=timerTask;
-            timerTask=null;//doing this in the timertask itself is does not happen early enough, so the same task is scheduled again and we get an exception
+//            runMarkerUpdateTimer = false;
+            TimerTask prevTimerTask = timerTask;
+            timerTask = null;//doing this in the timertask itself is does not happen early enough, so the same task is scheduled again and we get an exception
             prevTimerTask.cancel();
         }
     }
@@ -379,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (stopMarker == null) {
             stopMarker = mMap.addMarker(new MarkerOptions().position(closestStop).title("Closest stop"));
         } else {
-            stopMarker.setPosition(new LatLng(56.975571, 24.129731));//TODO set relevant position instead of hardcoded
+            stopMarker.setPosition(closestStop);//TODO set relevant position instead of hardcoded
         }
         //move to midpoint between currentLoc, and closest stop
         LatLng midpoint = SphericalUtil.interpolate(currentLoc, closestStop, 0.5);
@@ -389,24 +388,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void updateMarkerInfo() {
-        runMarkerUpdateTimer=true;
-        if(timer==null){
+//        runMarkerUpdateTimer = true;
+        if (timer == null) {
             timer = new Timer();
         }
-        if(timerTask==null){
+        if (timerTask == null) {
 
-            timerTask=new TimerTask() {//fix to have only one such thread running at a time
+            timerTask = new TimerTask() {//fix to have only one such thread running at a time
                 @Override
                 public void run() {
                     Calendar cal = Calendar.getInstance();
                     final int hour = cal.get(Calendar.HOUR_OF_DAY);
                     final int minute = cal.get(Calendar.MINUTE);
                     final int second = cal.get(Calendar.SECOND);
-                    if(!runMarkerUpdateTimer){
+//                    if (!runMarkerUpdateTimer) {
 //                        TimerTask localTimerTaskForCancellation=timerTask;
 //                        timerTask=null;
 //                        localTimerTaskForCancellation.cancel();//TODO fix cancelling prev timertask
-                    }
+//                    }
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -414,8 +413,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             if (stopMarker.isInfoWindowShown()) {
 
                                 stopMarker.setTitle("Pieturas nosaukums");
-                                stopMarker.setSnippet(hour + ":" + minute + ":" + second+"\n" +
-                                                hour + ":" + minute + ":" + second+"\n"+
+                                stopMarker.setSnippet(hour + ":" + minute + ":" + second + "\n" +
+                                        hour + ":" + minute + ":" + second + "\n" +
+                                        hour + ":" + minute + ":" + second + "\n" +
+                                        hour + ":" + minute + ":" + second + "\n" +
+                                        hour + ":" + minute + ":" + second + "\n" +
+                                        hour + ":" + minute + ":" + second + "\n" +
+                                        hour + ":" + minute + ":" + second + "\n" +
                                         hour + ":" + minute + ":" + second);
                                 stopMarker.showInfoWindow();
 
@@ -427,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             };
         }
-        timer.schedule(timerTask,0,1000);
+        timer.schedule(timerTask, 0, 1000);
     }
 
     /**
@@ -554,10 +558,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         };
         Property<Marker, LatLng> property = Property.of(Marker.class, LatLng.class, "position");
-        if(animator==null){
+        if (animator == null) {
             animator = ObjectAnimator.ofObject(marker, property, typeEvaluator, finalPosition);
-        }
-        else{
+        } else {
             animator.setObjectValues(finalPosition);
         }
         animator.setDuration(2000);
