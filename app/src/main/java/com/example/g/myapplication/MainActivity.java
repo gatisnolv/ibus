@@ -19,10 +19,6 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import java.io.*;
-//import org.apache.commons.csv.*;
-import org.onebusaway.gtfs.impl.*;
-import org.onebusaway.gtfs.model.*;
-import org.onebusaway.gtfs.serialization.*;
 
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -48,6 +44,7 @@ import java.util.*;
 
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+
     private static final String TAG = MainActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
@@ -55,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // A default location (Riga) and default zoom to use when location permission is
     // not granted.
-    private final LatLng mDefaultLocation = new LatLng(56.9496, 24.1052);
+    private final LatLng mDefaultLocation = new LatLng(56.9496, 24.1052);//Riga coordinates
     private static final int DEFAULT_ZOOM = 10;
     private static final int PERMISSIONS_GRANTED_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
@@ -69,26 +66,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
-
     //-----------------
     private GTFS gtfs;
     private boolean locationPermissionGrantedPreviously = false;
-    Marker stopMarker;
-
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-////        final TextView helloTextView = findViewById(R.id.text_view_id);
-////        helloTextView.setText(R.string.stops);
-//        System.out.println("something");
-//        gtfs = new GTFS(this);
-//    }
-
+    private Marker stopMarker;
+    private Marker currentLocationMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //        gtfs = new GTFS(this);
 
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
@@ -137,9 +125,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             MenuItem item = menu.getItem(0).getSubMenu().getItem(0).getSubMenu().add(Menu.NONE, busRouteIdOffset + i, i, "this is a long string");
 //            Log.d("sometag","a"+Integer.toString(item.getItemId()));
         }
-//        Log.d("sometag",getString(menu.getItem(0).getItemId()));
-//        Log.d("sometag",menu.getItem(0).getTitle().toString()+menu.getItem(0).getSubMenu().getItem(0).hasSubMenu());
-
         return true;
     }
 
@@ -154,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         int itemId = item.getItemId();
         switch (itemId) {
             case R.id.menu_name:
-//                item.ge
                 Log.d("sometag", "this happened");
                 break;
             case R.id.bus_menu:
@@ -172,14 +156,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Log.d("sometag", "this");
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(mDefaultLocation));
                 }
-
         }
         return true;
     }
 
     /**
-     * Manipulates the map when it's available.
-     * This callback is triggered when the map is ready to be used.
+     * Manipulates the map when it's available. This callback is triggered when the map is ready to be used.
      */
     @Override
     public void onMapReady(GoogleMap map) {
@@ -224,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //            }
 //        });
 
-        // Prompt the user for permission.
+        // Prompt the user for permission or determine that permission has been previously granted
         getLocationPermission();
 
         // Get the current location of the device and set the position of the map.
@@ -232,19 +214,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
-
-//        final Calendar calendarInstance=Calendar.getInstance();
-//        BroadcastReceiver minutesReceiver=new BroadcastReceiver() {
-//            @Override
-//            public void onReceive(Context context, Intent intent) {
-//                stopMarker.setTitle(Integer.toString(calendarInstance.get(Calendar.HOUR))+":"
-//                        +Integer.toString(calendarInstance.get(Calendar.MINUTE)));
-//                stopMarker.showInfoWindow();
-//            }
-//        };
-//
-//        registerReceiver(minutesReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
-
 
     }
 
@@ -266,24 +235,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
 
+        if (currentLocationMarker == null) {//first creation of marker
+            currentLocationMarker = mMap.addMarker(new MarkerOptions().position(currentLoc).title("Current loc"));
+        } else {//reuse same marker
+            currentLocationMarker.setPosition(currentLoc);
+        }
+
+        if (stopMarker == null) {
+            stopMarker = mMap.addMarker(new MarkerOptions().position(closestStop).title("Closest stop"));
+        } else {
+            stopMarker.setPosition(new LatLng(56.975571, 24.129731));//TODO set relevant position instead of hardcoded
+        }
         //move to midpoint between currentLoc, and closest stop
         LatLng midpoint = SphericalUtil.interpolate(currentLoc, closestStop, 0.5);
-
-        mMap.addMarker(new MarkerOptions().position(currentLoc).title("Current loc"));
-        stopMarker = mMap.addMarker(new MarkerOptions().position(closestStop).title("Closest stop"));
-//        stopMarker
         mMap.animateCamera(CameraUpdateFactory.newLatLng(midpoint));
         updateMarkerInfo();
 
-
-    }
-
-    public void updateHere(int h, int m, int s) {
-        stopMarker.setTitle(h + ":" + m + ":" + s);
-        if (stopMarker.isInfoWindowShown()) {
-            stopMarker.showInfoWindow();
-
-        }
     }
 
     public void updateMarkerInfo() {
@@ -291,24 +258,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         timer.schedule(new TimerTask() {//fix to have only one such thread running at a time
             @Override
             public void run() {
-                Calendar c = Calendar.getInstance();
-//                int mYear = c.get(Calendar.YEAR);
-//                int mMonth = c.get(Calendar.MONTH);
-//                int mDay = c.get(Calendar.DAY_OF_MONTH);
-                final int mHour = c.get(Calendar.HOUR_OF_DAY);
-                final int mMinute = c.get(Calendar.MINUTE);
-                final int mSecond = c.get(Calendar.SECOND);
+                Calendar cal = Calendar.getInstance();
+                final int hour = cal.get(Calendar.HOUR_OF_DAY);
+                final int minute = cal.get(Calendar.MINUTE);
+                final int second = cal.get(Calendar.SECOND);
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        updateHere(mHour, mMinute, mSecond);
-                        Log.d("freq","test");
+                        if (stopMarker.isInfoWindowShown()) {
+                            stopMarker.setTitle(hour + ":" + minute + ":" + second);
+                            stopMarker.showInfoWindow();
+
+                        }
+                        Log.d("freq", "test");
                     }
                 });
-
-//                stopMarker.setTitle(Integer.toString(mHour) + ":" + Integer.toString(mMinute) + ":" + Integer.toString(mSecond));
-//                stopMarker.showInfoWindow();
             }
 
         }, 0, 1000);
@@ -317,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     /**
      * Gets the current location of the device, and positions the map's camera.
      */
-    private void getDeviceLocation() {
+    private void getDeviceLocation() {//TODO make appropriate name
         /*
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
@@ -340,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         new LatLng(mLastKnownLocation.getLatitude(),
                                                 mLastKnownLocation.getLongitude()), PERMISSIONS_GRANTED_ZOOM));
                             }
-                        } else {
+                        } else {//getLastLocation task unsuccesful
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
                             mMap.moveCamera(CameraUpdateFactory
@@ -423,6 +388,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Log.e("Exception: %s", e.getMessage());
         }
     }
-
 
 }
