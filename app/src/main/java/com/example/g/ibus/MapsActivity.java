@@ -186,13 +186,22 @@ public class MapsActivity extends AppCompatActivity implements
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(56.946285, 24.105078), 15)); //56.946285, 24.105078
 
+<<<<<<< HEAD
+=======
+        Log.i(LOG, "onMapReady()");
+
+
+        mMap.setOnMarkerClickListener(this);
+
+>>>>>>> 73e5da339c520078f339ea68506763aba8858c40
         final Marker testBus = mMap.addMarker(new MarkerOptions()
-                .position(posStart)
-                .draggable(true)
-                .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("ic_bus",40,40)))
+                        .position(posStart)
+                        .draggable(true)
+                        .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("ic_bus",40,40)))
 //                .icon(BitmapDescriptorFactory.fromResource(R.drawable.bus)) --old/simple way of creating icon
                 /* .title("testBus") */ );
 
+<<<<<<< HEAD
         // Set a listener for marker click.
         mMap.setOnMarkerClickListener(this);
 
@@ -300,22 +309,32 @@ public class MapsActivity extends AppCompatActivity implements
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
+=======
+        mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(56.94, 24.1))
+                        .title("Bus stop")
+                        .snippet("Next bus in 5 minutes"));
+>>>>>>> 73e5da339c520078f339ea68506763aba8858c40
     }
 
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-//            marker.setPosition(...);
-            animateMarker(marker, posFinish,false);
-        return true;
+        //animateMarker(marker, posFinish,false);
+        marker.showInfoWindow();
+        return false;
     }
 
+<<<<<<< HEAD
     /**
      * Sets up the options menu.
      *
      * @param menu The options menu.
      * @return Boolean.
      */
+=======
+
+>>>>>>> 73e5da339c520078f339ea68506763aba8858c40
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu); //old from gatis R.menu.user_options_menu,
