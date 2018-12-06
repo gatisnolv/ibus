@@ -23,6 +23,7 @@ import java.io.*;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.*;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -43,7 +44,7 @@ import java.util.zip.*;
 import java.util.*;
 
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, OnInfoWindowCloseListener, OnMarkerClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private GoogleMap mMap;
@@ -167,18 +168,31 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap map) {
         mMap = map;
 
-        try {
-            // Customise the styling of the base map, hiding transit stops, which we cannot bind info windows to
-            boolean success = mMap.setMapStyle(
-                    MapStyleOptions.loadRawResourceStyle(
-                            this, R.raw.style_json));
+//        try {
+//            // Customise the styling of the base map, hiding transit stops, which we cannot bind info windows to
+//            boolean success = mMap.setMapStyle(
+//                    MapStyleOptions.loadRawResourceStyle(
+//                            this, R.raw.style_json));
+//
+//            if (!success) {
+//                Log.e(TAG, "Style parsing failed.");
+//            }
+//        } catch (Resources.NotFoundException e) {
+//            Log.e(TAG, "Can't find style. Error: ", e);
+//        }
 
-            if (!success) {
-                Log.e(TAG, "Style parsing failed.");
-            }
-        } catch (Resources.NotFoundException e) {
-            Log.e(TAG, "Can't find style. Error: ", e);
-        }
+//        mMap.setOnMarkerClickListener(this);
+//        mMap.setOnInfoWindowCloseListener(this);
+
+//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
+//            @Override
+//            public boolean onMarkerClick(Marker marker){
+//                if (marker==stopMarker){
+//                    Log.d("sometag","click");
+//                }
+//                return true;
+//            }
+//        });
 
         // Use a custom info window adapter to handle multiple lines of text in the
         // info window contents.
@@ -214,8 +228,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
+        mMap.setOnMarkerClickListener(this);
+        mMap.setOnInfoWindowCloseListener(this);
 
     }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        if (marker.equals(stopMarker)) {
+            Log.d("sometag", "stopMark");
+        } else if (marker.equals(currentLocationMarker)) {
+            Log.d("sometag", "currLocMark");
+        }
+        marker.showInfoWindow();
+        return true;
+    }
+
+    @Override
+    public void onInfoWindowClose(Marker marker) {//when pressing marker with open infowindow, close event appears to always happen before reopen, so handling the start/stop of timer should not be a problem
+        if (marker.equals(stopMarker)) {
+            Log.d("sometag", "closeEvent");
+
+        }
+    }
+
 
     public void findClosestStop(View view) {
         List<LatLng> stopList = new ArrayList<>();
