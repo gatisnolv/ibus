@@ -274,6 +274,54 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        animation();
+
+    }
+
+    public void animation() {
+        LatLng maja = new LatLng(56.971977, 24.190068);
+        Marker marker = mMap.addMarker(new MarkerOptions().position(maja).title("markeris"));
+        //        LatLng galapunkts=new LatLng(56.968288, 24.193106);
+        //        LatLng kristaps=new LatLng(56.969654, 24.184742);
+        final List<LatLng> locList = new ArrayList<>();
+        locList.add(new LatLng(56.968288, 24.193106));
+        locList.add(new LatLng(56.968288, 24.184742));
+        locList.add(new LatLng(56.968288, 24.174742));
+        locList.add(new LatLng(56.968288, 24.164742));
+
+        class Listener implements Animator.AnimatorListener {
+            Marker marker;
+            Iterator<LatLng> locIterator;
+
+            Listener(Marker marker, Iterator<LatLng> locIterator) {
+                this.marker = marker;
+                this.locIterator = locIterator;
+            }
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (locIterator.hasNext()) {
+                    animateMarker(marker, locIterator.next());
+                    Log.d("TAG", "here");
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+            }
+        }
+        Iterator<LatLng> locIterator = locList.iterator();
+        Animator.AnimatorListener listener = new Listener(marker, locIterator);
+        animateMarker(marker, locIterator.next());
+        animator.addListener(listener);
     }
 
     @Override
@@ -297,8 +345,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (marker.equals(stopMarker)) {
             Log.d("sometag", "closeEvent");
             runMarkerUpdateTimer=false;
+            TimerTask prevTimerTask=timerTask;
             timerTask=null;//doing this in the timertask itself is does not happen early enough, so the same task is scheduled again and we get an exception
-
+            prevTimerTask.cancel();
         }
     }
 
