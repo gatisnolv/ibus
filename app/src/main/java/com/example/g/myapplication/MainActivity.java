@@ -1,5 +1,8 @@
 package com.example.g.myapplication;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
+import android.animation.TypeEvaluator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,9 +15,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Property;
+import android.view.*;
+import android.graphics.*;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.*;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -35,6 +42,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.maps.android.SphericalUtil;
+import com.google.maps.*;
 
 import android.content.res.Resources;
 
@@ -72,6 +80,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private boolean locationPermissionGrantedPreviously = false;
     private Marker stopMarker;
     private Marker currentLocationMarker;
+    boolean runMarkerUpdateTimer;
+    Timer timer;
+    TimerTask timerTask;
+    Context mContext=this;
+    ObjectAnimator animator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -231,12 +244,47 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnMarkerClickListener(this);
         mMap.setOnInfoWindowCloseListener(this);
 
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+            @Override
+            public View getInfoWindow(Marker arg0) {
+                return null;
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+
+                LinearLayout info = new LinearLayout(mContext);
+                info.setOrientation(LinearLayout.VERTICAL);
+
+                TextView title = new TextView(mContext);
+                title.setTextColor(Color.BLACK);
+                title.setGravity(Gravity.CENTER);
+                title.setTypeface(null, Typeface.BOLD);
+                title.setText(marker.getTitle());
+
+                TextView snippet = new TextView(mContext);
+                snippet.setTextColor(Color.GRAY);
+                snippet.setText(marker.getSnippet());
+
+                info.addView(title);
+                info.addView(snippet);
+
+                return info;
+            }
+        });
+
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
         if (marker.equals(stopMarker)) {
             Log.d("sometag", "stopMark");
+            if(!stopMarker.isInfoWindowShown()){
+                updateMarkerInfo();
+            }
+//            InfoWindow infoWindow=new
+//            marker.set
         } else if (marker.equals(currentLocationMarker)) {
             Log.d("sometag", "currLocMark");
         }
@@ -248,6 +296,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onInfoWindowClose(Marker marker) {//when pressing marker with open infowindow, close event appears to always happen before reopen, so handling the start/stop of timer should not be a problem
         if (marker.equals(stopMarker)) {
             Log.d("sometag", "closeEvent");
+            runMarkerUpdateTimer=false;
+            timerTask=null;//doing this in the timertask itself is does not happen early enough, so the same task is scheduled again and we get an exception
 
         }
     }
@@ -285,34 +335,50 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //move to midpoint between currentLoc, and closest stop
         LatLng midpoint = SphericalUtil.interpolate(currentLoc, closestStop, 0.5);
         mMap.animateCamera(CameraUpdateFactory.newLatLng(midpoint));
-        updateMarkerInfo();
+//        updateMarkerInfo();
 
     }
 
     public void updateMarkerInfo() {
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {//fix to have only one such thread running at a time
-            @Override
-            public void run() {
-                Calendar cal = Calendar.getInstance();
-                final int hour = cal.get(Calendar.HOUR_OF_DAY);
-                final int minute = cal.get(Calendar.MINUTE);
-                final int second = cal.get(Calendar.SECOND);
+        runMarkerUpdateTimer=true;
+        if(timer==null){
+            timer = new Timer();
+        }
+        if(timerTask==null){
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (stopMarker.isInfoWindowShown()) {
-                            stopMarker.setTitle(hour + ":" + minute + ":" + second);
-                            stopMarker.showInfoWindow();
-
-                        }
-                        Log.d("freq", "test");
+            timerTask=new TimerTask() {//fix to have only one such thread running at a time
+                @Override
+                public void run() {
+                    Calendar cal = Calendar.getInstance();
+                    final int hour = cal.get(Calendar.HOUR_OF_DAY);
+                    final int minute = cal.get(Calendar.MINUTE);
+                    final int second = cal.get(Calendar.SECOND);
+                    if(!runMarkerUpdateTimer){
+//                        TimerTask localTimerTaskForCancellation=timerTask;
+//                        timerTask=null;
+//                        localTimerTaskForCancellation.cancel();//TODO fix cancelling prev timertask
                     }
-                });
-            }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
 
-        }, 0, 1000);
+                            if (stopMarker.isInfoWindowShown()) {
+
+                                stopMarker.setTitle("Pieturas nosaukums");
+                                stopMarker.setSnippet(hour + ":" + minute + ":" + second+"\n" +
+                                                hour + ":" + minute + ":" + second+"\n"+
+                                        hour + ":" + minute + ":" + second);
+                                stopMarker.showInfoWindow();
+
+                            }
+                            Log.d("freq", "test");
+                        }
+                    });
+                }
+
+            };
+        }
+        timer.schedule(timerTask,0,1000);
     }
 
     /**
@@ -423,6 +489,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
+    }
+
+    public static LatLng interpolate(float fraction, LatLng a, LatLng b) {
+        double lat = (b.latitude - a.latitude) * fraction + a.latitude;
+        double lng = (b.longitude - a.longitude) * fraction + a.longitude;
+        return new LatLng(lat, lng);
+    }
+
+    void animateMarker(Marker marker, LatLng finalPosition) {
+        TypeEvaluator<LatLng> typeEvaluator = new TypeEvaluator<LatLng>() {
+            @Override
+            public LatLng evaluate(float fraction, LatLng startValue, LatLng endValue) {
+                return interpolate(fraction, startValue, endValue);
+            }
+        };
+        Property<Marker, LatLng> property = Property.of(Marker.class, LatLng.class, "position");
+        if(animator==null){
+            animator = ObjectAnimator.ofObject(marker, property, typeEvaluator, finalPosition);
+        }
+        else{
+            animator.setObjectValues(finalPosition);
+        }
+        animator.setDuration(2000);
+        animator.start();
     }
 
 }
