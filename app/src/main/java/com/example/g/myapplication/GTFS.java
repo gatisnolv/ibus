@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.Enumeration;
 import java.util.zip.*;
 import java.util.*;
+
 import android.util.Log;
 
 import android.content.*;
@@ -17,10 +18,10 @@ import java.time.*;
 
 
 public class GTFS {
-    private static final String PAST_MIDNIGHT="24:";
-    private static final String PAST_MIDNIGHT_AFTER_ONE="25:";
-    private static final String NEXT_DAY_BEGINNING="00:";
-    private static final String NEXT_DAY_PAST_ONE="01:";
+    private static final String PAST_MIDNIGHT = "24:";
+    private static final String PAST_MIDNIGHT_AFTER_ONE = "25:";
+    private static final String NEXT_DAY_BEGINNING = "00:";
+    private static final String NEXT_DAY_PAST_ONE = "01:";
 
     private static final int BUS = 3;
     private static final int TROLLEY = 800;
@@ -82,7 +83,7 @@ public class GTFS {
             this.short_name = short_name;
             this.long_name = long_name;
             this.type = type;
-            trips=new ArrayList<>();
+            trips = new ArrayList<>();
         }
 
         public String getId() {
@@ -167,25 +168,25 @@ public class GTFS {
 //            stoptimes=new LinkedList<>();
         }
 
-        public String getHeadsign(){
+        public String getHeadsign() {
             return headsign;
         }
 
-        public int getTripId(){
+        public int getTripId() {
             return tripId;
         }
 
-        public boolean operatesOnDay(int day){
+        public boolean operatesOnDay(int day) {
 //            Log.d("today",Boolean.toString(serviceIdsToCalendars.get(serviceId)[(day+6)%7]));
 //            Log.d("operates","input: "+day+"index: "+((day+5)%7));
-            return serviceIdsToCalendars.get(serviceId)[(day+5)%7];
+            return serviceIdsToCalendars.get(serviceId)[(day + 5) % 7];
         }
 
-        public boolean operatesAtTime(LocalTime time){
-            List<StopTime> stopTimes=tripIdsToStopTimes.get(tripId);
-            StopTime firstStopTime=stopTimes.get(0);
-            StopTime lastStopTime=stopTimes.get(stopTimes.size()-1);
-            if(time.isAfter(firstStopTime.departure) && time.isBefore(lastStopTime.arrival)){
+        public boolean operatesAtTime(LocalTime time) {
+            List<StopTime> stopTimes = tripIdsToStopTimes.get(tripId);
+            StopTime firstStopTime = stopTimes.get(0);
+            StopTime lastStopTime = stopTimes.get(stopTimes.size() - 1);
+            if (time.isAfter(firstStopTime.departure) && time.isBefore(lastStopTime.arrival)) {
                 return true;
             }
             return false;
@@ -205,7 +206,7 @@ public class GTFS {
             this.id = id;
             this.name = name;
             this.coordinate = coordinate;
-            routesWhoseTripsHaveThisStop=new ArrayList<>();
+            routesWhoseTripsHaveThisStop = new ArrayList<>();
         }
 
         public void addRoute(Route input) {
@@ -286,7 +287,7 @@ public class GTFS {
 
     }
 
-    public Collection<Route> getTramRoutes(){
+    public Collection<Route> getTramRoutes() {
 //        List<String> result=new ArrayList<>();
 //        for(Route route:routeIdsToTramRoutes.values()){
 //            result.add(route.getShortName()+" "+route.getLongName());
@@ -364,8 +365,8 @@ public class GTFS {
         stopIdsToStops.put(id, stop);
     }
 
-    private boolean toBoolean(int input){
-        return input==1?true:false;
+    private boolean toBoolean(int input) {
+        return input == 1 ? true : false;
     }
 
     private void readCalendar(CsvRow input) {
@@ -407,17 +408,17 @@ public class GTFS {
             String arrivalString = stopTime.getField(ARRIVAL_TIME);
             String departureString = stopTime.getField(ARRIVAL_TIME);
 
-            if (arrivalString.startsWith(PAST_MIDNIGHT)){
-                arrivalString=NEXT_DAY_BEGINNING+arrivalString.substring(3);//index 3 - after colon
+            if (arrivalString.startsWith(PAST_MIDNIGHT)) {
+                arrivalString = NEXT_DAY_BEGINNING + arrivalString.substring(3);//index 3 - after colon
             }
-            if (departureString.startsWith(PAST_MIDNIGHT)){
-                departureString=NEXT_DAY_BEGINNING+departureString.substring(3);//index 3 - after colon
+            if (departureString.startsWith(PAST_MIDNIGHT)) {
+                departureString = NEXT_DAY_BEGINNING + departureString.substring(3);//index 3 - after colon
             }
-            if(arrivalString.startsWith(PAST_MIDNIGHT_AFTER_ONE)){
-                arrivalString=NEXT_DAY_PAST_ONE+arrivalString.substring(3);//index 3 - after colon
+            if (arrivalString.startsWith(PAST_MIDNIGHT_AFTER_ONE)) {
+                arrivalString = NEXT_DAY_PAST_ONE + arrivalString.substring(3);//index 3 - after colon
             }
-            if(departureString.startsWith(PAST_MIDNIGHT_AFTER_ONE)){
-                departureString=NEXT_DAY_PAST_ONE+departureString.substring(3);//index 3 - after colon
+            if (departureString.startsWith(PAST_MIDNIGHT_AFTER_ONE)) {
+                departureString = NEXT_DAY_PAST_ONE + departureString.substring(3);//index 3 - after colon
             }
 
             LocalTime arrival = LocalTime.parse(arrivalString);
@@ -432,27 +433,26 @@ public class GTFS {
 
     }
 
-    private void initHashMaps(){
-        int initCapacity=10000;
-        routeIdsToBusRoutes=new HashMap<>(initCapacity);
-       routeIdsToTrolleyRoutes=new HashMap<>(initCapacity);
-       routeIdsToTramRoutes=new HashMap<>(initCapacity);
-        routeIdsToAllRoutes=new HashMap<>(initCapacity);
-        stopIdsToStops=new HashMap<>(initCapacity);
-        serviceIdsToCalendars=new HashMap<>(initCapacity);
-        shapeIdsToShapes=new HashMap<>(initCapacity);
-        tripIdsToStopTimes=new HashMap<>(initCapacity);
+    private void initHashMaps() {
+        routeIdsToBusRoutes = new HashMap<>(routesContainer.getRowCount() + 1);
+        routeIdsToTrolleyRoutes = new HashMap<>(routesContainer.getRowCount() + 1);
+        routeIdsToTramRoutes = new HashMap<>(routesContainer.getRowCount() + 1);
+        routeIdsToAllRoutes = new HashMap<>(routesContainer.getRowCount() + 1);
+        stopIdsToStops = new HashMap<>(stopsContainer.getRowCount() + 1);
+        serviceIdsToCalendars = new HashMap<>(calendarContainer.getRowCount() + 1);
+        shapeIdsToShapes = new HashMap<>(tripsContainer.getRowCount() + 1);
+        tripIdsToStopTimes = new HashMap<>(tripsContainer.getRowCount() + 1);
     }
 
     private void getGTFS() {
-        Thread t1=new Thread(){
-            @Override
-            public void run(){
-                readShapes();
-            }
-        };
-        t1.start();
-        Thread t2=new Thread(){
+//        Thread t1=new Thread(){
+//            @Override
+//            public void run(){
+//                readShapes();
+//            }
+//        };
+//        t1.start();
+        Thread t2 = new Thread() {
             @Override
             public void run() {
                 readStopTimes();
@@ -468,15 +468,13 @@ public class GTFS {
         for (CsvRow calendar : calendarContainer.getRows()) {
             readCalendar(calendar);
         }
-        try{
-            t1.join();
+        try {
+//            t1.join();
             t2.join();
-        }catch (InterruptedException e){
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-//        readShapes();
-//        readStopTimes();
         for (CsvRow trip : tripsContainer.getRows()) {
             readTrip(trip);
         }
