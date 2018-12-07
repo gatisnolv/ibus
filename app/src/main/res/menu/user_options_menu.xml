@@ -7,11 +7,14 @@
         app:showAsAction="always">
         <menu>
             <item android:id="@+id/bus_menu"
-                android:title="@string/bus"><menu></menu> </item>
+                android:title="@string/bus"
+                android:icon="@drawable/bus"><menu></menu> </item>
             <item android:id="@+id/trolley_menu"
-                android:title="@string/trolley"><menu></menu> </item>
+                android:title="@string/trolley"
+                android:icon="@drawable/trolley"><menu></menu> </item>
             <item android:id="@+id/tram_menu"
-                android:title="@string/tram"><menu></menu></item>
+                android:title="@string/tram"
+                android:icon="@drawable/tram"><menu></menu></item>
         </menu>
     </item>
 </menu>

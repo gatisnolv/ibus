@@ -21,6 +21,7 @@ import android.graphics.*;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.*;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -33,21 +34,25 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.*;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.*;
+import com.example.g.myapplication.GTFS.*;
 
 import android.content.res.Resources;
 
 import de.siegmar.fastcsv.reader.*;
 
+import java.time.LocalTime;
 import java.util.zip.*;
 import java.util.*;
 
@@ -84,12 +89,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     TimerTask timerTask;
     Context mContext = this;
     ObjectAnimator animator;
+    List<LatLng> shape = new ArrayList<>();
+    Calendar cal=Calendar.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //        gtfs = new GTFS(this);
+        gtfs = new GTFS(this);
+        List<Route> tramRoutes=new ArrayList<>(gtfs.getTramRoutes());
+        Collections.sort(tramRoutes);
+
+        for(Route tramRoute:tramRoutes){
+//            Log.d("tram r",tramRoute.getShortName()+" "+tramRoute.getLongName());
+            for(Trip trip:tramRoute.getTrips()){
+//                Log.d("tram r ","\t Direction:"+trip.getHeadsign()+" "+trip.getTripId());
+                if(trip.operatesOnDay(cal.get(Calendar.DAY_OF_WEEK))){
+                    Log.d("today","\t Direction:"+trip.getHeadsign()+" "+trip.getTripId());
+                    LocalTime testTime=LocalTime.of(12,0,0);
+                    if(trip.operatesAtTime(testTime)){
+                        Log.d("tram r","operates at time");
+                    }else{
+                        Log.d("tram r","does not operate at time");
+                    }
+
+                }
+            }
+
+        }
 
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
@@ -180,58 +207,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap map) {
         mMap = map;
 
-//        try {
-//            // Customise the styling of the base map, hiding transit stops, which we cannot bind info windows to
-//            boolean success = mMap.setMapStyle(
-//                    MapStyleOptions.loadRawResourceStyle(
-//                            this, R.raw.style_json));
-//
-//            if (!success) {
-//                Log.e(TAG, "Style parsing failed.");
-//            }
-//        } catch (Resources.NotFoundException e) {
-//            Log.e(TAG, "Can't find style. Error: ", e);
-//        }
-
-//        mMap.setOnMarkerClickListener(this);
-//        mMap.setOnInfoWindowCloseListener(this);
-
-//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
-//            @Override
-//            public boolean onMarkerClick(Marker marker){
-//                if (marker==stopMarker){
-//                    Log.d("sometag","click");
-//                }
-//                return true;
-//            }
-//        });
-
-        // Use a custom info window adapter to handle multiple lines of text in the
-        // info window contents.
-//        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-//
-//            @Override
-//            // Return null here, so that getInfoContents() is called next.
-//            public View getInfoWindow(Marker arg0) {
-//                return null;
-//            }
-//
-//            @Override
-//            public View getInfoContents(Marker marker) {
-//                // Inflate the layouts for the info window, title and snippet.
-//                View infoWindow = getLayoutInflater().inflate(R.layout.custom_info_contents,
-//                        (FrameLayout) findViewById(R.id.map), false);
-//
-//                TextView title = ((TextView) infoWindow.findViewById(R.id.title));
-//                title.setText(marker.getTitle());
-//
-//                TextView snippet = ((TextView) infoWindow.findViewById(R.id.snippet));
-//                snippet.setText(marker.getSnippet());
-//
-//                return infoWindow;
-//            }
-//        });
-
         // Prompt the user for permission or determine that permission has been previously granted
         getLocationPermission();
 
@@ -271,6 +246,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 return info;
             }
+//            public View getInfoContents(Marker marker) {
+//                // Inflate the layouts for the info window, title and snippet.
+//                View infoWindow = getLayoutInflater().inflate(R.layout.custom_info_contents,
+//                        (FrameLayout) findViewById(R.id.map), false);
+//
+//                TextView title = ((TextView) infoWindow.findViewById(R.id.title));
+//                title.setText(marker.getTitle());
+//
+//                TextView snippet = ((TextView) infoWindow.findViewById(R.id.snippet));
+//                snippet.setText(marker.getSnippet());
+//
+//                return infoWindow;
+//            }
         });
 
         animation();
@@ -280,13 +268,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void animation() {
         LatLng maja = new LatLng(56.971977, 24.190068);
         Marker marker = mMap.addMarker(new MarkerOptions().position(maja).title("markeris"));
-        //        LatLng galapunkts=new LatLng(56.968288, 24.193106);
-        //        LatLng kristaps=new LatLng(56.969654, 24.184742);
+        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus));
         final List<LatLng> locList = new ArrayList<>();
+        locList.add(new LatLng(56.971977, 24.190068));
         locList.add(new LatLng(56.968288, 24.193106));
         locList.add(new LatLng(56.968288, 24.184742));
         locList.add(new LatLng(56.968288, 24.174742));
         locList.add(new LatLng(56.968288, 24.164742));
+        mMap.addPolyline(new PolylineOptions().addAll(locList).color(0x70FF0000).width(6));
 
         class Listener implements Animator.AnimatorListener {
             Marker marker;
@@ -383,8 +372,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //move to midpoint between currentLoc, and closest stop
         LatLng midpoint = SphericalUtil.interpolate(currentLoc, closestStop, 0.5);
         mMap.animateCamera(CameraUpdateFactory.newLatLng(midpoint));
-//        updateMarkerInfo();
-
+        animator.end();
     }
 
     public void updateMarkerInfo() {
@@ -560,6 +548,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Property<Marker, LatLng> property = Property.of(Marker.class, LatLng.class, "position");
         if (animator == null) {
             animator = ObjectAnimator.ofObject(marker, property, typeEvaluator, finalPosition);
+            animator.setInterpolator(new LinearInterpolator());
         } else {
             animator.setObjectValues(finalPosition);
         }
