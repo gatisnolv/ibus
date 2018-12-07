@@ -128,7 +128,9 @@ public class GTFS {
                     return GREATER;
                 }
             } else {
-                return this.id.compareTo(input.id);
+                Integer thisInt=Integer.parseInt(this.id);
+                Integer otherInt=Integer.parseInt(input.id);
+                return thisInt.compareTo(otherInt);
             }
         }
 

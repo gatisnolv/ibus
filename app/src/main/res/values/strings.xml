@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MyApp</string>
+    <string name="app_name">iBus</string>
     <string name="gtfs">gtfs.zip</string>
     <string name="stops">stops.txt</string>
     <string name="shapes">shapes.txt</string>
