@@ -128,8 +128,8 @@ public class GTFS {
                     return GREATER;
                 }
             } else {
-                Integer thisInt=Integer.parseInt(this.id);
-                Integer otherInt=Integer.parseInt(input.id);
+                Integer thisInt=Integer.parseInt(this.short_name);
+                Integer otherInt=Integer.parseInt(input.short_name);
                 return thisInt.compareTo(otherInt);
             }
         }

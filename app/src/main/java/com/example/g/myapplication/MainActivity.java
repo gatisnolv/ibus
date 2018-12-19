@@ -90,33 +90,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Context mContext = this;
     ObjectAnimator animator;
     List<LatLng> shape = new ArrayList<>();
-    Calendar cal=Calendar.getInstance();
+    Calendar cal = Calendar.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         gtfs = new GTFS(this);
-        List<Route> tramRoutes=new ArrayList<>(gtfs.getTramRoutes());
-        Collections.sort(tramRoutes);
 
-        for(Route tramRoute:tramRoutes){
-//            Log.d("tram r",tramRoute.getShortName()+" "+tramRoute.getLongName());
-            for(Trip trip:tramRoute.getTrips()){
-//                Log.d("tram r ","\t Direction:"+trip.getHeadsign()+" "+trip.getTripId());
-                if(trip.operatesOnDay(cal.get(Calendar.DAY_OF_WEEK))){
-                    Log.d("today","\t Direction:"+trip.getHeadsign()+" "+trip.getTripId());
-                    LocalTime testTime=LocalTime.of(12,0,0);
-                    if(trip.operatesAtTime(testTime)){
-                        Log.d("tram r","operates at time");
-                    }else{
-                        Log.d("tram r","does not operate at time");
-                    }
-
-                }
-            }
-
-        }
 
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
@@ -161,10 +142,38 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         int trolleyRouteIdOffset = 200;
         int tramRouteIdOffset = 300;
         getMenuInflater().inflate(R.menu.user_options_menu, menu);
-        for (int i = 0; i < 20; i++) {
-            MenuItem item = menu.getItem(0).getSubMenu().getItem(0).getSubMenu().add(Menu.NONE, busRouteIdOffset + i, i, "this is a long string");
-//            Log.d("sometag","a"+Integer.toString(item.getItemId()));
+
+
+        List<Route> tramRoutes = new ArrayList<>(gtfs.getTramRoutes());
+        Collections.sort(tramRoutes);
+
+
+        int i = 0;
+        for (Route tramRoute : tramRoutes) {
+
+//            Log.d("tram r",tramRoute.getShortName()+" "+tramRoute.getLongName());
+//            for(Trip trip:tramRoute.getTrips()){
+////                Log.d("tram r ","\t Direction:"+trip.getHeadsign()+" "+trip.getTripId());
+//                if(trip.operatesOnDay(cal.get(Calendar.DAY_OF_WEEK))){
+//                    Log.d("today","\t Direction:"+trip.getHeadsign()+" "+trip.getTripId());
+//                    LocalTime testTime=LocalTime.of(12,0,0);
+//                    if(trip.operatesAtTime(testTime)){
+//                        Log.d("tram r","operates at time");
+//                    }else{
+//                        Log.d("tram r","does not operate at time");
+//                    }
+//
+//                }
+//            }
+            MenuItem item = menu.getItem(0).getSubMenu().getItem(2).getSubMenu().add(Menu.NONE, busRouteIdOffset + i, i, tramRoute.getShortName()+" "+tramRoute.getLongName());
+            i++;
         }
+
+
+//        for (int i = 0; i < 20; i++) {
+//            MenuItem item = menu.getItem(0).getSubMenu().getItem(0).getSubMenu().add(Menu.NONE, busRouteIdOffset + i, i, "this is a long string");
+//            Log.d("sometag","a"+Integer.toString(item.getItemId()));
+//        }
         return true;
     }
 
@@ -196,6 +205,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Log.d("sometag", "this");
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(mDefaultLocation));
                 }
+
         }
         return true;
     }
@@ -266,15 +276,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void animation() {
-        LatLng maja = new LatLng(56.971977, 24.190068);
-        Marker marker = mMap.addMarker(new MarkerOptions().position(maja).title("markeris"));
+        LatLng start = new LatLng(56.946287, 24.116042);
+        Marker marker = mMap.addMarker(new MarkerOptions().position(start).title("markeris"));
         marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.bus));
         final List<LatLng> locList = new ArrayList<>();
-        locList.add(new LatLng(56.971977, 24.190068));
-        locList.add(new LatLng(56.968288, 24.193106));
-        locList.add(new LatLng(56.968288, 24.184742));
-        locList.add(new LatLng(56.968288, 24.174742));
-        locList.add(new LatLng(56.968288, 24.164742));
+        locList.add(start);
+        locList.add(new LatLng(56.944132, 24.109365));
+        locList.add(new LatLng(56.946288, 24.104154));
+        locList.add(new LatLng(56.942888, 24.097614));
+        locList.add(new LatLng(56.937908, 24.088009));
+        locList.add(new LatLng(56.936476, 24.079562));
         mMap.addPolyline(new PolylineOptions().addAll(locList).color(0x70FF0000).width(6));
 
         class Listener implements Animator.AnimatorListener {
@@ -342,9 +353,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void findClosestStop(View view) {
         List<LatLng> stopList = new ArrayList<>();
-        stopList.add(new LatLng(56.968985, 24.188312));
-        stopList.add(new LatLng(56.969662, 24.184618));
-        stopList.add(new LatLng(56.977891, 24.182042));
+        stopList.add(new LatLng(56.975894, 24.133793));
+        stopList.add(new LatLng(56.975743, 24.134369));
+        stopList.add(new LatLng(56.974339, 24.135560));
 
         LatLng currentLoc = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
         LatLng closestStop = currentLoc; //iffy initialization
@@ -357,15 +368,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 closestStop = stop;
             }
         }
+        String stopTitle;
+        if (closestStop == stopList.get(2)) {
+            stopTitle = "Ierēdņu iela";
+        } else {
+            stopTitle = "Upes iela";
+        }
 
         if (currentLocationMarker == null) {//first creation of marker
-            currentLocationMarker = mMap.addMarker(new MarkerOptions().position(currentLoc).title("Current loc"));
+            currentLocationMarker = mMap.addMarker(new MarkerOptions().position(currentLoc).title("Current location"));
         } else {//reuse same marker
             currentLocationMarker.setPosition(currentLoc);
         }
 
         if (stopMarker == null) {
-            stopMarker = mMap.addMarker(new MarkerOptions().position(closestStop).title("Closest stop"));
+            stopMarker = mMap.addMarker(new MarkerOptions().position(closestStop).title(stopTitle));
         } else {
             stopMarker.setPosition(closestStop);//TODO set relevant position instead of hardcoded
         }
@@ -400,7 +417,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                             if (stopMarker.isInfoWindowShown()) {
 
-                                stopMarker.setTitle("Pieturas nosaukums");
+//                                stopMarker.setTitle("Pieturas nosaukums");
                                 stopMarker.setSnippet(hour + ":" + minute + ":" + second + "\n" +
                                         hour + ":" + minute + ":" + second + "\n" +
                                         hour + ":" + minute + ":" + second + "\n" +
